@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&P Collateral Loans - Loan Application Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+        }
+        label, input, select, textarea {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            background: blue;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        canvas {
+            border: 1px solid black;
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>A&P Collateral Loans - Loan Application Form</h2>
+    <form id="loanForm">
+        <label>Name (as per National ID):</label>
+        <input type="text" name="name" required><label>Identification Type:</label>
+    <select name="idType" required>
+        <option value="ID">National ID</option>
+        <option value="Passport">Passport</option>
+        <option value="DL">Driving Licence</option>
+    </select>
+
+    <label>ID Number:</label>
+    <input type="text" name="idNumber" required>
+
+    <label>Upload Identification Document:</label>
+    <input type="file" name="idDocument" accept="image/*,application/pdf" required>
+
+    <label>Date of Birth:</label>
+    <input type="date" name="dob" required>
+
+    <label>Phone Number:</label>
+    <input type="tel" name="phone" required>
+
+    <label>Collateral Details:</label>
+    <textarea name="collateral" required></textarea>
+
+    <label>Upload Item Image:</label>
+    <input type="file" name="itemImage" accept="image/*" required>
+
+    <label>Upload Receipts and Relevant Documents:</label>
+    <input type="file" name="receipts" accept="image/*,application/pdf" multiple required>
+
+    <label>Loan Amount:</label>
+    <input type="number" name="loanAmount" required>
+
+    <label>Borrowing Date:</label>
+    <input type="date" name="borrowDate" required>
+
+    <label>Borrowing Period (in months):</label>
+    <input type="number" name="borrowPeriod" required>
+
+    <label>Terms and Conditions:</label>
+    <p>The collateral should not be faulty. The client must provide original receipts.</p>
+
+    <label>Live Selfie Verification:</label>
+    <video id="video" width="100%" autoplay></video>
+    <button type="button" id="capture">Capture Selfie</button>
+    <canvas id="canvas"></canvas>
+
+    <label>Signature of Client:</label>
+    <canvas id="signaturePad"></canvas>
+    <button type="button" id="clearSignature">Clear Signature</button>
+
+    <label>Signature of Lender (Purity Mutheu):</label>
+    <input type="text" name="lenderSignature" required>
+
+    <label>Signature of Witness (Abraham Odoyo):</label>
+    <input type="text" name="witnessSignature" required>
+
+    <label>Loan Approval Status:</label>
+    <select name="loanStatus" id="loanStatus" required>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Declined">Declined</option>
+    </select>
+
+    <button type="submit">Submit</button>
+</form>
+
+<p id="responseMessage" style="display:none; font-weight: bold;"></p>
+
+<script>
+    document.getElementById("loanForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        
+        let status = document.getElementById("loanStatus").value;
+        let responseMessage = document.getElementById("responseMessage");
+        
+        if (status === "Approved") {
+            responseMessage.innerText = "Your loan has been approved!";
+            responseMessage.style.color = "green";
+        } else if (status === "Declined") {
+            responseMessage.innerText = "Your loan has been declined.";
+            responseMessage.style.color = "red";
+        } else {
+            responseMessage.innerText = "Your application is under review.";
+            responseMessage.style.color = "blue";
+        }
+        responseMessage.style.display = "block";
+    });
+
+    // Live selfie capture functionality
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const context = canvas.getContext('2d');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(error => {
+            console.error('Error accessing webcam:', error);
+        });
+
+    captureButton.addEventListener('click', () => {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    });
+
+    // Signature pad functionality
+    const signaturePad = document.getElementById('signaturePad');
+    const clearSignatureButton = document.getElementById('clearSignature');
+    const signatureContext = signaturePad.getContext('2d');
+
+    let drawing = false;
+
+    signaturePad.addEventListener('mousedown', (e) => {
+        drawing = true;
+        signatureContext.beginPath();
+        signatureContext.moveTo(e.offsetX, e.offsetY);
+    });
+
+    signaturePad.addEventListener('mousemove', (e) => {
+        if (drawing) {
+            signatureContext.lineTo(e.offsetX, e.offsetY);
+            signatureContext.stroke();
+        }
+    });
+
+    signaturePad.addEventListener('mouseup', () => {
+        drawing = false;
+    });
+
+    signaturePad.addEventListener('mouseleave', () => {
+        drawing = false;
+    });
+
+    clearSignatureButton.addEventListener('click', () => {
+        signatureContext.clearRect(0, 0, signaturePad.width, signaturePad.height);
+    });
+</script>
+
+</body>
+</html>
